@@ -93,13 +93,17 @@ VescPacket::VescPacket(const std::string & name, int payload_size, int payload_i
 }
 
 VescPacket::VescPacket(const std::string & name, int payload_size, int payload_id, int can_id)
-: VescFrame(payload_size), name_(name)
+: VescFrame(payload_size = (can_id == 0 ? 1 : 3)), name_(name)
 {
   assert(payload_id >= 0 && payload_id < 256);
   assert(std::distance(payload_.first, payload_.second) > 0);
-  *(payload_.first) = COMM_FORWARD_CAN;
-  *(payload_.first + 1) = can_id;
-  *(payload_.first + 2) = payload_id;
+  if(can_id != 0){
+    *(payload_.first) = COMM_FORWARD_CAN;
+    *(payload_.first + 1) = can_id;
+    *(payload_.first + 2) = payload_id;
+  }else{
+    *payload_.first = payload_id;
+  }
 }
 
 VescPacket::VescPacket(const std::string & name, std::shared_ptr<VescFrame> raw)

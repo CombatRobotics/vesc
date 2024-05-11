@@ -128,31 +128,30 @@ void VescDriver::timerCallback()
     rclcpp::shutdown();
     return;
   }
-    int can_id = 11;
 
-  /*
-   * Driver state machine, modes:
-   *  INITIALIZING - request and wait for vesc version
-   *  OPERATING - receiving commands from subscriber topics
-   */
-  if (driver_mode_ == MODE_INITIALIZING) {
-    // request version number, return packet will update the internal version numbers
-    vesc_.requestFWVersion(can_id);
-    if (fw_version_major_ >= 0 && fw_version_minor_ >= 0) {
-      RCLCPP_INFO(
-        get_logger(), "Connected to VESC with firmware version %d.%d",
-        fw_version_major_, fw_version_minor_);
-      driver_mode_ = MODE_OPERATING;
+  // List of CAN IDs
+    std::vector<int> can_ids = {0, 11}; // Add more CAN IDs if needed
+
+    for (int can_id : can_ids) {
+        if (driver_mode_ == MODE_INITIALIZING) {
+            // request version number, return packet will update the internal version numbers
+            vesc_.requestFWVersion(can_id);
+            if (fw_version_major_ >= 0 && fw_version_minor_ >= 0) {
+                RCLCPP_INFO(
+                    get_logger(), "Connected to VESC with firmware version %d.%d",
+                    fw_version_major_, fw_version_minor_);
+                driver_mode_ = MODE_OPERATING;
+            }
+        } else if (driver_mode_ == MODE_OPERATING) {
+            // poll for vesc state (telemetry)
+            vesc_.requestState(can_id);
+            // poll for vesc imu
+            // vesc_.requestImuData();
+        } else {
+            // unknown mode, how did that happen?
+            assert(false && "unknown driver mode");
+        }
     }
-  } else if (driver_mode_ == MODE_OPERATING) {
-    // poll for vesc state (telemetry)
-    vesc_.requestState(can_id);
-    // poll for vesc imu
-    vesc_.requestImuData();
-  } else {
-    // unknown mode, how did that happen?
-    assert(false && "unknown driver mode");
-  }
 }
 
 void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & packet)
