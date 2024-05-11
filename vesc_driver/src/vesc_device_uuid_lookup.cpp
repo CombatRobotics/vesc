@@ -39,7 +39,7 @@ VescDeviceLookup::VescDeviceLookup(std::string name)
 {
   try {
     vesc_.connect(device_);
-    vesc_.requestFWVersion();
+    vesc_.requestFWVersion(10);
   } catch (SerialException e) {
     std::cerr << "VESC error on port " << device_ << std::endl << e.what() << std::endl;
     return;

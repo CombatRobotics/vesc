@@ -128,6 +128,7 @@ void VescDriver::timerCallback()
     rclcpp::shutdown();
     return;
   }
+    int can_id = 11;
 
   /*
    * Driver state machine, modes:
@@ -136,7 +137,7 @@ void VescDriver::timerCallback()
    */
   if (driver_mode_ == MODE_INITIALIZING) {
     // request version number, return packet will update the internal version numbers
-    vesc_.requestFWVersion();
+    vesc_.requestFWVersion(can_id);
     if (fw_version_major_ >= 0 && fw_version_minor_ >= 0) {
       RCLCPP_INFO(
         get_logger(), "Connected to VESC with firmware version %d.%d",
@@ -145,7 +146,7 @@ void VescDriver::timerCallback()
     }
   } else if (driver_mode_ == MODE_OPERATING) {
     // poll for vesc state (telemetry)
-    vesc_.requestState();
+    vesc_.requestState(can_id);
     // poll for vesc imu
     vesc_.requestImuData();
   } else {

@@ -100,8 +100,9 @@ public:
     return name_;
   }
 
-protected:
+protected:  
   VescPacket(const std::string & name, int payload_size, int payload_id);
+  VescPacket(const std::string & name, int payload_size, int payload_id, int can_id);
   VescPacket(const std::string & name, std::shared_ptr<VescFrame> raw);
 
 private:
@@ -139,6 +140,7 @@ class VescPacketRequestFWVersion : public VescPacket
 {
 public:
   VescPacketRequestFWVersion();
+  VescPacketRequestFWVersion(int can_id);
 };
 
 /*------------------------------------------------------------------------------------------------*/
@@ -178,7 +180,7 @@ public:
 class VescPacketRequestValues : public VescPacket
 {
 public:
-  VescPacketRequestValues();
+  VescPacketRequestValues(int can_id);
 };
 /*------------------------------------------------------------------------------------------------*/
 
