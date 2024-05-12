@@ -220,7 +220,7 @@ void VescInterface::disconnect()
   if (isConnected()) {
     // bring down read thread
     impl_->packet_thread_run_ = false;
-    requestFWVersion();
+    // requestFWVersion();
     impl_->packet_thread_->join();
     impl_->serial_driver_->port()->close();
   }
@@ -241,14 +241,14 @@ void VescInterface::send(const VescPacket & packet)
   impl_->serial_driver_->port()->async_send(packet.frame());
 }
 
-void VescInterface::requestFWVersion()
+void VescInterface::requestFWVersion(int can_id)
 {
-  send(VescPacketRequestFWVersion());
+  send(VescPacketRequestFWVersion(can_id));
 }
 
-void VescInterface::requestState()
+void VescInterface::requestState(int can_id)
 {
-  send(VescPacketRequestValues());
+  send(VescPacketRequestValues(can_id));
 }
 
 void VescInterface::setDutyCycle(double duty_cycle)

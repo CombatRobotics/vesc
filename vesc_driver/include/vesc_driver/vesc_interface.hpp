@@ -114,8 +114,8 @@ public:
    */
   void send(const VescPacket & packet);
 
-  void requestFWVersion();
-  void requestState();
+  void requestFWVersion(int can_id);
+  void requestState(int can_id);
   void requestImuData();
 
   void setDutyCycle(double duty_cycle);

@@ -1,6 +1,16 @@
-/**:
+/left_wheels/vesc_driver:
   ros__parameters:
-    port: "/dev/ttyACM0"
+    port: /dev/ttyACM0
+    can_ids:
+    - 0 # always keep z in first index
+    - 10 # vesc 1
+    - 11 # vesc 2
+    # - 12 # vesc 3
+    wheel_ids: # this array lenth should match with can_ids param 
+    - uart # always keep uart in first index 
+    - left_front 
+    - left_mid
+    # - left_back
     brake_max: 200000.0
     brake_min: -20000.0
     current_max: 100.0
@@ -9,7 +19,50 @@
     duty_cycle_min: 0.0
     position_max: 0.0
     position_min: 0.0
+    qos_overrides:
+      /parameter_events:
+        publisher:
+          depth: 1000
+          durability: volatile
+          history: keep_last
+          reliability: reliable
     servo_max: 0.85
     servo_min: 0.15
     speed_max: 23250.0
     speed_min: -23250.0
+    use_sim_time: false
+
+/right_wheels/vesc_driver:
+  ros__parameters:
+    port: /dev/ttyACM0
+    can_ids:
+    - 0 # always keep z in first index
+    - 10 # vesc 1
+    - 11 # vesc 2
+    # - 12 # vesc 3
+    wheel_ids: # this array lenth should match with can_ids param 
+    - uart # always keep uart in first index 
+    - right_front 
+    - right_mid
+    # - right_back
+    brake_max: 200001.0
+    brake_min: -20001.0
+    current_max: 101.0
+    current_min: 0.0
+    duty_cycle_max: 0.0
+    duty_cycle_min: 0.0
+    position_max: 0.0
+    position_min: 0.0
+    qos_overrides:
+      /parameter_events:
+        publisher:
+          depth: 1000
+          durability: volatile
+          history: keep_last
+          reliability: reliable
+    servo_max: 0.85
+    servo_min: 0.15
+    speed_max: 23250.0
+    speed_min: -23250.0
+    use_sim_time: false
+

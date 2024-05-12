@@ -91,6 +91,11 @@ private:
   CommandLimit position_limit_;
   CommandLimit servo_limit_;
 
+  // parameters var
+  std::vector<long int> can_ids_{0, 10, 11};
+  std::vector<std::string> wheel_ids_{"self", "left_front", "left_mid"};
+  std::vector<std::pair<long int, std::string>> id_pairs_;
+
   // ROS services
   rclcpp::Publisher<VescStateStamped>::SharedPtr state_pub_;
   rclcpp::Publisher<VescImuStamped>::SharedPtr imu_pub_;
@@ -126,6 +131,10 @@ private:
   void servoCallback(const Float64::SharedPtr servo);
   void speedCallback(const Float64::SharedPtr speed);
   void timerCallback();
+
+  // util functions
+  std::string findWheelID(const std::vector<std::pair<long int, std::string>>& id_pairs, long int can_id);
+
 };
 
 }  // namespace vesc_driver

@@ -92,6 +92,20 @@ VescPacket::VescPacket(const std::string & name, int payload_size, int payload_i
   *payload_.first = payload_id;
 }
 
+VescPacket::VescPacket(const std::string & name, int payload_size, int payload_id, int can_id)
+: VescFrame(payload_size = (can_id == 0 ? 1 : 3)), name_(name)
+{
+  assert(payload_id >= 0 && payload_id < 256);
+  assert(std::distance(payload_.first, payload_.second) > 0);
+  if(can_id != 0){
+    *(payload_.first) = COMM_FORWARD_CAN;
+    *(payload_.first + 1) = can_id;
+    *(payload_.first + 2) = payload_id;
+  }else{
+    *payload_.first = payload_id;
+  }
+}
+
 VescPacket::VescPacket(const std::string & name, std::shared_ptr<VescFrame> raw)
 : VescFrame(*raw), name_(name)
 {
@@ -158,6 +172,14 @@ VescPacketRequestFWVersion::VescPacketRequestFWVersion()
   *(frame_->end() - 2) = static_cast<uint8_t>(crc & 0xFF);
 }
 
+VescPacketRequestFWVersion::VescPacketRequestFWVersion(int can_id)
+: VescPacket("RequestFWVersion", 3, COMM_FW_VERSION, can_id)
+{
+  uint16_t crc = CRC::Calculate(
+    &(*payload_.first), std::distance(payload_.first, payload_.second), VescFrame::CRC_TYPE);
+  *(frame_->end() - 3) = static_cast<uint8_t>(crc >> 8);
+  *(frame_->end() - 2) = static_cast<uint8_t>(crc & 0xFF);
+}
 /*------------------------------------------------------------------------------------------------*/
 
 VescPacketValues::VescPacketValues(std::shared_ptr<VescFrame> raw)
@@ -402,8 +424,8 @@ double VescPacketValues::avg_vq()  const
 
 REGISTER_PACKET_TYPE(COMM_GET_VALUES, VescPacketValues)
 
-VescPacketRequestValues::VescPacketRequestValues()
-: VescPacket("RequestValues", 1, COMM_GET_VALUES)
+VescPacketRequestValues::VescPacketRequestValues(int can_id)
+: VescPacket("RequestValues", 3, COMM_GET_VALUES, can_id)
 {
   uint16_t crc = CRC::Calculate(
     &(*payload_.first), std::distance(payload_.first, payload_.second), VescFrame::CRC_TYPE);

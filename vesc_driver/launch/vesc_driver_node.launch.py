@@ -51,7 +51,15 @@ def generate_launch_description():
         Node(
             package='vesc_driver',
             executable='vesc_driver_node',
-            name='vesc_driver_node',
+            name='vesc_driver',
+            namespace='left_wheels',
+            parameters=[LaunchConfiguration("config")]
+        ),
+        Node(
+            package='vesc_driver',
+            executable='vesc_driver_node',
+            name='vesc_driver',
+            namespace='right_wheels',
             parameters=[LaunchConfiguration("config")]
         ),
 
