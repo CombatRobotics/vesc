@@ -68,6 +68,10 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
   // get vesc serial port address
   std::string port = declare_parameter<std::string>("port", "");
 
+  this->declare_parameter("can_ids", can_ids_);
+  this->get_parameter("can_ids", can_ids_);
+
+
   // attempt to connect to the serial port
   try {
     vesc_.connect(port);
@@ -130,9 +134,8 @@ void VescDriver::timerCallback()
   }
 
   // List of CAN IDs
-    std::vector<int> can_ids = {0, 11}; // Add more CAN IDs if needed
 
-    for (int can_id : can_ids) {
+    for (int can_id : can_ids_) {
         if (driver_mode_ == MODE_INITIALIZING) {
             // request version number, return packet will update the internal version numbers
             vesc_.requestFWVersion(can_id);
@@ -145,8 +148,6 @@ void VescDriver::timerCallback()
         } else if (driver_mode_ == MODE_OPERATING) {
             // poll for vesc state (telemetry)
             vesc_.requestState(can_id);
-            // poll for vesc imu
-            // vesc_.requestImuData();
         } else {
             // unknown mode, how did that happen?
             assert(false && "unknown driver mode");

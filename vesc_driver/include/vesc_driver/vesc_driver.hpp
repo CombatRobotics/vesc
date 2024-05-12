@@ -91,6 +91,9 @@ private:
   CommandLimit position_limit_;
   CommandLimit servo_limit_;
 
+  // parameters var
+  std::vector<long int> can_ids_{0, 11};
+
   // ROS services
   rclcpp::Publisher<VescStateStamped>::SharedPtr state_pub_;
   rclcpp::Publisher<VescImuStamped>::SharedPtr imu_pub_;
