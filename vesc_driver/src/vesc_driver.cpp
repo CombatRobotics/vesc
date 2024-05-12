@@ -69,8 +69,13 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
   std::string port = declare_parameter<std::string>("port", "");
 
   this->declare_parameter("can_ids", can_ids_);
+  this->declare_parameter("wheel_ids", wheel_ids_);
   this->get_parameter("can_ids", can_ids_);
+  this->get_parameter("wheel_ids", wheel_ids_);
 
+  for (size_t i = 0; i < can_ids_.size() && i < wheel_ids_.size(); ++i) {
+      id_pairs_.push_back(std::make_pair(can_ids_[i], wheel_ids_[i]));
+  }
 
   // attempt to connect to the serial port
   try {
@@ -124,6 +129,17 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
   - try to predict vesc bounds (from vesc config) and command detect bounds errors
 */
 
+
+std::string VescDriver::findWheelID(const std::vector<std::pair<long int, std::string>>& id_pairs, long int can_id) {
+    for (const auto& pair : id_pairs) {
+        if (pair.first == can_id) {
+            return pair.second; // Return wheel ID if CAN ID matches
+        }
+    }
+    return ""; // Return empty string if no match found
+}
+
+
 void VescDriver::timerCallback()
 {
   // VESC interface should not unexpectedly disconnect, but test for it anyway
@@ -163,7 +179,7 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & pa
 
     auto state_msg = VescStateStamped();
     state_msg.header.stamp = now();
-
+    state_msg.header.frame_id = findWheelID(id_pairs_, values->controller_id());
     state_msg.state.voltage_input = values->v_in();
     state_msg.state.current_motor = values->avg_motor_current();
     state_msg.state.current_input = values->avg_input_current();
